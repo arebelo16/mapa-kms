@@ -1,9 +1,11 @@
-const CACHE_NAME = 'mapa-kms-v2';
+const CACHE_NAME = 'mapa-kms-v3';
 const ASSETS = [
   './',
   './index.html',
   './style.css',
   './app.js',
+  './auth.js',
+  './push.js',
   './manifest.json',
   './vendor/exceljs.min.js',
   './assets/template.xlsx',
@@ -23,6 +25,33 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((keys) =>
       Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
     ).then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener('push', (event) => {
+  let data = { title: 'Mapa de Kms', body: 'Lembrete: falta preencher a timesheet deste mês.' };
+  if (event.data) {
+    try { data = { ...data, ...event.data.json() }; } catch (e) { /* keep default */ }
+  }
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: './icons/icon-192.png',
+      badge: './icons/icon-192.png',
+      tag: 'mapa-kms-lembrete',
+    })
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if ('focus' in client) return client.focus();
+      }
+      if (clients.openWindow) return clients.openWindow('./index.html');
+    })
   );
 });
 

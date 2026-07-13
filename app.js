@@ -335,11 +335,48 @@ async function exportarExcel() {
   }
 }
 
+// ---------- Tema ----------
+
+const THEME_KEY = 'kmsTheme';
+
+function aplicarTema(tema) {
+  if (tema === 'auto') {
+    delete document.documentElement.dataset.theme;
+  } else {
+    document.documentElement.dataset.theme = tema;
+  }
+}
+
+function initTema() {
+  const sel = document.getElementById('tema');
+  const saved = localStorage.getItem(THEME_KEY) || 'auto';
+  sel.value = saved;
+  aplicarTema(saved);
+  sel.addEventListener('change', () => {
+    localStorage.setItem(THEME_KEY, sel.value);
+    aplicarTema(sel.value);
+  });
+}
+
+// ---------- Painel de definições ----------
+
+function initSettingsPanel() {
+  const panel = document.getElementById('settings-panel');
+  document.getElementById('btn-settings').addEventListener('click', () => {
+    panel.hidden = false;
+  });
+  document.getElementById('btn-close-settings').addEventListener('click', () => {
+    panel.hidden = true;
+  });
+}
+
 // ---------- Init ----------
 
 window.addEventListener('DOMContentLoaded', () => {
   populateMonthSelect();
   loadSettings();
+  initTema();
+  initSettingsPanel();
   document.getElementById('btn-preview').addEventListener('click', gerarPreview);
   document.getElementById('btn-export').addEventListener('click', exportarExcel);
   FIXED_FIELDS.forEach(f => {

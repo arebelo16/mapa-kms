@@ -1,0 +1,104 @@
+/* Notificações push (lembrete mensal de preencher a timesheet). */
+
+const WORKER_URL = 'https://mapa-kms-notify.arebelo16.workers.dev';
+const VAPID_PUBLIC_KEY = 'BPrTLzEB3F8aAz1JOliICOfwctU0V9zCuKDesKkvbOcOj-dLja0wWVmGW_CykeS58w9TOmRWbwcxJrKy7t0SbpM';
+const NOTIF_KEY = 'kmsNotifEnabled';
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; i++) outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
+}
+
+function pushSupported() {
+  return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+}
+
+async function ativarNotificacoes() {
+  if (!pushSupported()) {
+    throw new Error('Este browser não suporta notificações push. No iPhone, instala a app primeiro (Adicionar ao Ecrã Principal).');
+  }
+  const permission = await Notification.requestPermission();
+  if (permission !== 'granted') {
+    throw new Error('Permissão de notificações negada.');
+  }
+  const reg = await navigator.serviceWorker.ready;
+  let sub = await reg.pushManager.getSubscription();
+  if (!sub) {
+    sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+    });
+  }
+  await fetch(`${WORKER_URL}/subscribe`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ subscription: sub.toJSON() }),
+  });
+  localStorage.setItem(NOTIF_KEY, '1');
+  return sub;
+}
+
+async function desativarNotificacoes() {
+  localStorage.removeItem(NOTIF_KEY);
+  if (!pushSupported()) return;
+  const reg = await navigator.serviceWorker.ready;
+  const sub = await reg.pushManager.getSubscription();
+  if (sub) {
+    await fetch(`${WORKER_URL}/unsubscribe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ endpoint: sub.endpoint }),
+    }).catch(() => {});
+    await sub.unsubscribe();
+  }
+}
+
+async function marcarTimesheetPreenchida() {
+  await fetch(`${WORKER_URL}/mark-done`, { method: 'POST' });
+}
+
+function notificacoesAtivas() {
+  return localStorage.getItem(NOTIF_KEY) === '1';
+}
+
+function initNotifSettings() {
+  const toggle = document.getElementById('notifToggle');
+  const statusEl = document.getElementById('notif-status');
+  const btnMarkDone = document.getElementById('btn-mark-done');
+
+  toggle.checked = notificacoesAtivas();
+
+  toggle.addEventListener('change', async () => {
+    statusEl.textContent = '';
+    if (toggle.checked) {
+      try {
+        await ativarNotificacoes();
+        statusEl.textContent = 'Lembretes ativados.';
+      } catch (e) {
+        toggle.checked = false;
+        statusEl.textContent = e.message;
+      }
+    } else {
+      await desativarNotificacoes();
+      statusEl.textContent = 'Lembretes desativados.';
+    }
+  });
+
+  btnMarkDone.addEventListener('click', async () => {
+    btnMarkDone.disabled = true;
+    try {
+      await marcarTimesheetPreenchida();
+      statusEl.textContent = 'Marcado — sem mais lembretes este mês.';
+    } catch (e) {
+      statusEl.textContent = 'Erro ao marcar: ' + e.message;
+    } finally {
+      btnMarkDone.disabled = false;
+    }
+  });
+}
+
+window.addEventListener('DOMContentLoaded', initNotifSettings);

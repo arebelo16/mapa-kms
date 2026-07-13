@@ -14,109 +14,177 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="app-header">
-  <h1>Mapa de Kms</h1>
-  <p class="subtitle">GHH - Services Portugal, Lda.</p>
-</header>
 
-<main>
-  <section class="card" id="form-card">
-    <h2>1. Dados da viagem</h2>
-    <div class="grid-form">
-      <label>Mês
-        <select id="mes"></select>
-      </label>
-      <label>Ano
-        <input type="number" id="ano" min="2020" max="2100" step="1">
-      </label>
-      <label>Partida
-        <input type="text" id="partida" placeholder="Azeitão">
-      </label>
-      <label>Destino
-        <input type="text" id="destino" placeholder="Lisboa">
-      </label>
-      <label>Hora de ida
-        <input type="time" id="horaIda">
-      </label>
-      <label>Hora de volta
-        <input type="time" id="horaVolta">
-      </label>
-      <label class="span2">Descrição (cliente)
-        <input type="text" id="descricao" placeholder="Deslocação ao cliente ...">
-      </label>
+<div id="lock-screen" class="lock-screen">
+  <div class="lock-card">
+    <div class="lock-icon">🔒</div>
+    <h1>Mapa de Kms</h1>
+    <p class="subtitle">GHH - Services Portugal, Lda.</p>
+    <p class="lock-status" id="lock-status">A verificar…</p>
+    <button id="btn-unlock" class="btn-primary" hidden>Desbloquear com Passkey</button>
+    <button id="btn-create-passkey" class="btn-primary" hidden>Criar Passkey</button>
+    <button id="btn-use-existing" class="btn-link" hidden>Já tenho uma passkey neste site</button>
+    <p class="lock-error" id="lock-error"></p>
+  </div>
+</div>
+
+<div id="app-root" hidden>
+  <header class="app-header">
+    <button id="btn-settings" class="icon-btn" aria-label="Definições">⚙️</button>
+    <div class="header-title">
+      <h1>Mapa de Kms</h1>
+      <p class="subtitle">GHH - Services Portugal, Lda.</p>
     </div>
+    <button id="btn-lock" class="icon-btn" aria-label="Bloquear">🔒</button>
+  </header>
 
-    <details id="dados-fixos">
-      <summary>Dados fixos (nome, categoria, matrícula...)</summary>
+  <main>
+    <section class="card" id="form-card">
+      <h2>1. Mês a gerar</h2>
       <div class="grid-form">
-        <label>Nome do funcionário
-          <input type="text" id="nome">
+        <label>Mês
+          <select id="mes"></select>
         </label>
-        <label>Categoria
-          <input type="text" id="categoria">
-        </label>
-        <label>Departamento
-          <input type="text" id="departamento">
-        </label>
-        <label>Matrícula
-          <input type="text" id="matricula">
+        <label>Ano
+          <input type="number" id="ano" min="2020" max="2100" step="1">
         </label>
       </div>
-    </details>
+      <button id="btn-preview" class="btn-primary">Gerar Preview</button>
+    </section>
 
-    <details id="avancado">
-      <summary>Avançado (valor alvo e taxa por km)</summary>
-      <div class="grid-form">
-        <label>Valor alvo (€)
-          <input type="number" id="valorAlvo" step="0.01" min="0">
-        </label>
-        <label>Taxa (€/km)
-          <input type="number" id="taxa" step="0.001" min="0">
-        </label>
+    <section class="card" id="preview-card" hidden>
+      <h2>2. Preview — confirma os dias</h2>
+      <p class="hint">Os feriados nacionais já foram excluídos automaticamente. Desmarca dias de férias/folga — os kms recalculam sozinhos para o total continuar a bater com o valor alvo.</p>
+      <div id="holiday-note" class="holiday-note"></div>
+      <div class="table-wrap">
+        <table id="preview-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Dia</th>
+              <th>Data ida</th>
+              <th>Hora ida</th>
+              <th>Data volta</th>
+              <th>Hora volta</th>
+              <th>Kms</th>
+              <th>Trajeto</th>
+            </tr>
+          </thead>
+          <tbody id="preview-body"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="6" class="total-label">TOTAL</td>
+              <td id="total-kms">0</td>
+              <td id="total-valor"></td>
+            </tr>
+          </tfoot>
+        </table>
       </div>
-    </details>
+      <button id="btn-export" class="btn-primary">Exportar Excel</button>
+      <p class="status" id="export-status"></p>
+    </section>
+  </main>
 
-    <button id="btn-preview" class="btn-primary">Gerar Preview</button>
-  </section>
+  <footer>
+    <p>Funciona offline. No iPhone: partilhar → Adicionar ao Ecrã Principal.</p>
+  </footer>
+</div>
 
-  <section class="card" id="preview-card" hidden>
-    <h2>2. Preview — confirma os dias</h2>
-    <p class="hint">Os feriados nacionais já foram excluídos automaticamente. Desmarca dias de férias/folga — os kms recalculam sozinhos para o total continuar a bater com o valor alvo.</p>
-    <div id="holiday-note" class="holiday-note"></div>
-    <div class="table-wrap">
-      <table id="preview-table">
-        <thead>
-          <tr>
-            <th></th>
-            <th>Dia</th>
-            <th>Data ida</th>
-            <th>Hora ida</th>
-            <th>Data volta</th>
-            <th>Hora volta</th>
-            <th>Kms</th>
-            <th>Trajeto</th>
-          </tr>
-        </thead>
-        <tbody id="preview-body"></tbody>
-        <tfoot>
-          <tr>
-            <td colspan="6" class="total-label">TOTAL</td>
-            <td id="total-kms">0</td>
-            <td id="total-valor"></td>
-          </tr>
-        </tfoot>
-      </table>
+<div id="settings-panel" class="settings-panel" hidden>
+  <div class="settings-card">
+    <div class="settings-head">
+      <h2>Definições</h2>
+      <button id="btn-close-settings" class="icon-btn" aria-label="Fechar">✕</button>
     </div>
-    <button id="btn-export" class="btn-primary">Exportar Excel</button>
-    <p class="status" id="export-status"></p>
-  </section>
-</main>
 
-<footer>
-  <p>Funciona offline. No iPhone: partilhar → Adicionar ao Ecrã Principal.</p>
-</footer>
+    <div class="settings-body">
+      <section class="settings-section">
+        <h3>Aparência</h3>
+        <div class="grid-form">
+          <label>Tema
+            <select id="tema">
+              <option value="auto">Automático (sistema)</option>
+              <option value="light">Claro</option>
+              <option value="dark">Escuro</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <h3>Dados fixos</h3>
+        <div class="grid-form">
+          <label>Nome do funcionário
+            <input type="text" id="nome">
+          </label>
+          <label>Categoria
+            <input type="text" id="categoria">
+          </label>
+          <label>Departamento
+            <input type="text" id="departamento">
+          </label>
+          <label>Matrícula
+            <input type="text" id="matricula">
+          </label>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <h3>Rota e horário</h3>
+        <div class="grid-form">
+          <label>Partida
+            <input type="text" id="partida">
+          </label>
+          <label>Destino
+            <input type="text" id="destino">
+          </label>
+          <label>Hora de ida
+            <input type="time" id="horaIda">
+          </label>
+          <label>Hora de volta
+            <input type="time" id="horaVolta">
+          </label>
+          <label class="span2">Descrição (cliente)
+            <input type="text" id="descricao">
+          </label>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <h3>Valores</h3>
+        <div class="grid-form">
+          <label>Valor alvo (€)
+            <input type="number" id="valorAlvo" step="0.01" min="0">
+          </label>
+          <label>Taxa (€/km)
+            <input type="number" id="taxa" step="0.001" min="0">
+          </label>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <h3>Notificações</h3>
+        <p class="hint">Lembretes para preencher a timesheet: a partir do dia 10 às 13h, e a partir do dia 16 às 11h e às 17h. No iPhone só funciona depois de instalares a app (Adicionar ao Ecrã Principal).</p>
+        <label class="checkbox-row">
+          <input type="checkbox" id="notifToggle">
+          Ativar lembretes diários
+        </label>
+        <p class="status" id="notif-status"></p>
+        <button id="btn-mark-done" class="btn-secondary">Timesheet preenchida este mês</button>
+      </section>
+
+      <section class="settings-section">
+        <h3>Segurança</h3>
+        <p class="hint" id="passkey-status">—</p>
+        <button id="btn-add-passkey" class="btn-secondary">Adicionar passkey neste dispositivo</button>
+      </section>
+    </div>
+  </div>
+</div>
 
 <script src="vendor/exceljs.min.js"></script>
+<script src="auth.js"></script>
+<script src="push.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
