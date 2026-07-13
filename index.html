@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f6feb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mapa de Kms">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<title>Mapa de Kms — HN</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="app-header">
+  <h1>Mapa de Kms</h1>
+  <p class="subtitle">GHH - Services Portugal, Lda.</p>
+</header>
+
+<main>
+  <section class="card" id="form-card">
+    <h2>1. Dados da viagem</h2>
+    <div class="grid-form">
+      <label>Mês
+        <select id="mes"></select>
+      </label>
+      <label>Ano
+        <input type="number" id="ano" min="2020" max="2100" step="1">
+      </label>
+      <label>Partida
+        <input type="text" id="partida" placeholder="Azeitão">
+      </label>
+      <label>Destino
+        <input type="text" id="destino" placeholder="Lisboa">
+      </label>
+      <label>Hora de ida
+        <input type="time" id="horaIda">
+      </label>
+      <label>Hora de volta
+        <input type="time" id="horaVolta">
+      </label>
+      <label class="span2">Descrição (cliente)
+        <input type="text" id="descricao" placeholder="Deslocação ao cliente ...">
+      </label>
+    </div>
+
+    <details id="dados-fixos">
+      <summary>Dados fixos (nome, categoria, matrícula...)</summary>
+      <div class="grid-form">
+        <label>Nome do funcionário
+          <input type="text" id="nome">
+        </label>
+        <label>Categoria
+          <input type="text" id="categoria">
+        </label>
+        <label>Departamento
+          <input type="text" id="departamento">
+        </label>
+        <label>Matrícula
+          <input type="text" id="matricula">
+        </label>
+      </div>
+    </details>
+
+    <details id="avancado">
+      <summary>Avançado (valor alvo e taxa por km)</summary>
+      <div class="grid-form">
+        <label>Valor alvo (€)
+          <input type="number" id="valorAlvo" step="0.01" min="0">
+        </label>
+        <label>Taxa (€/km)
+          <input type="number" id="taxa" step="0.001" min="0">
+        </label>
+      </div>
+    </details>
+
+    <button id="btn-preview" class="btn-primary">Gerar Preview</button>
+  </section>
+
+  <section class="card" id="preview-card" hidden>
+    <h2>2. Preview — confirma os dias</h2>
+    <p class="hint">Os feriados nacionais já foram excluídos automaticamente. Desmarca dias de férias/folga — os kms recalculam sozinhos para o total continuar a bater com o valor alvo.</p>
+    <div id="holiday-note" class="holiday-note"></div>
+    <div class="table-wrap">
+      <table id="preview-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Dia</th>
+            <th>Data ida</th>
+            <th>Hora ida</th>
+            <th>Data volta</th>
+            <th>Hora volta</th>
+            <th>Kms</th>
+            <th>Trajeto</th>
+          </tr>
+        </thead>
+        <tbody id="preview-body"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="6" class="total-label">TOTAL</td>
+            <td id="total-kms">0</td>
+            <td id="total-valor"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <button id="btn-export" class="btn-primary">Exportar Excel</button>
+    <p class="status" id="export-status"></p>
+  </section>
+</main>
+
+<footer>
+  <p>Funciona offline. No iPhone: partilhar → Adicionar ao Ecrã Principal.</p>
+</footer>
+
+<script src="vendor/exceljs.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
