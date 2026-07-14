@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mapa-kms-v3';
+const CACHE_NAME = 'mapa-kms-v4';
 const ASSETS = [
   './',
   './index.html',
@@ -6,6 +6,7 @@ const ASSETS = [
   './app.js',
   './auth.js',
   './push.js',
+  './admin.js',
   './manifest.json',
   './vendor/exceljs.min.js',
   './assets/template.xlsx',

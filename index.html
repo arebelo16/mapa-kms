@@ -15,32 +15,56 @@
 </head>
 <body>
 
-<div id="lock-screen" class="lock-screen">
+<div class="bg-orbs" aria-hidden="true">
+  <span class="orb orb-1"></span>
+  <span class="orb orb-2"></span>
+  <span class="orb orb-3"></span>
+</div>
+
+<div id="login-screen" class="lock-screen">
   <div class="lock-card">
-    <div class="lock-icon">🔒</div>
+    <div class="lock-icon">🔐</div>
     <h1>Mapa de Kms</h1>
     <p class="subtitle">GHH - Services Portugal, Lda.</p>
-    <p class="lock-status" id="lock-status">A verificar…</p>
-    <button id="btn-unlock" class="btn-primary" hidden>Desbloquear com Passkey</button>
-    <button id="btn-create-passkey" class="btn-primary" hidden>Criar Passkey</button>
-    <button id="btn-use-existing" class="btn-link" hidden>Já tenho uma passkey neste site</button>
-    <p class="lock-error" id="lock-error"></p>
+
+    <form id="login-form" autocomplete="on">
+      <label class="field-label">Utilizador
+        <input type="text" id="loginUsername" name="username" autocomplete="username" required>
+      </label>
+      <label class="field-label">Password
+        <input type="password" id="loginPassword" name="password" autocomplete="current-password" required>
+      </label>
+      <button type="submit" id="btn-login" class="btn-primary">
+        <span class="btn-label">Entrar</span>
+        <span class="spinner" hidden></span>
+      </button>
+    </form>
+
+    <div class="divider"><span>ou</span></div>
+
+    <button id="btn-login-passkey" class="btn-secondary">
+      <span class="btn-label">Entrar com Passkey</span>
+      <span class="spinner" hidden></span>
+    </button>
+
+    <p class="lock-error" id="login-error"></p>
   </div>
 </div>
 
 <div id="app-root" hidden>
   <header class="app-header">
+    <button id="btn-admin" class="icon-btn" aria-label="Admin" hidden>🛡️</button>
     <button id="btn-settings" class="icon-btn" aria-label="Definições">⚙️</button>
     <div class="header-title">
       <h1>Mapa de Kms</h1>
       <p class="subtitle">GHH - Services Portugal, Lda.</p>
     </div>
-    <button id="btn-lock" class="icon-btn" aria-label="Bloquear">🔒</button>
+    <button id="btn-logout" class="icon-btn" aria-label="Sair">🚪</button>
   </header>
 
   <main>
-    <section class="card" id="form-card">
-      <h2>1. Mês a gerar</h2>
+    <section class="card reveal" id="form-card">
+      <h2><span class="step-badge">1</span>Mês a gerar</h2>
       <div class="grid-form">
         <label>Mês
           <select id="mes"></select>
@@ -49,11 +73,14 @@
           <input type="number" id="ano" min="2020" max="2100" step="1">
         </label>
       </div>
-      <button id="btn-preview" class="btn-primary">Gerar Preview</button>
+      <button id="btn-preview" class="btn-primary">
+        <span class="btn-label">Gerar Preview</span>
+        <span class="spinner" hidden></span>
+      </button>
     </section>
 
-    <section class="card" id="preview-card" hidden>
-      <h2>2. Preview — confirma os dias</h2>
+    <section class="card reveal" id="preview-card" hidden>
+      <h2><span class="step-badge">2</span>Preview — confirma os dias</h2>
       <p class="hint">Os feriados nacionais já foram excluídos automaticamente. Desmarca dias de férias/folga — os kms recalculam sozinhos para o total continuar a bater com o valor alvo.</p>
       <div id="holiday-note" class="holiday-note"></div>
       <div class="table-wrap">
@@ -80,7 +107,10 @@
           </tfoot>
         </table>
       </div>
-      <button id="btn-export" class="btn-primary">Exportar Excel</button>
+      <button id="btn-export" class="btn-primary">
+        <span class="btn-label">Exportar Excel</span>
+        <span class="spinner" hidden></span>
+      </button>
       <p class="status" id="export-status"></p>
     </section>
   </main>
@@ -90,14 +120,14 @@
   </footer>
 </div>
 
-<div id="settings-panel" class="settings-panel" hidden>
-  <div class="settings-card">
-    <div class="settings-head">
+<div id="settings-panel" class="side-panel" hidden>
+  <div class="side-card">
+    <div class="side-head">
       <h2>Definições</h2>
       <button id="btn-close-settings" class="icon-btn" aria-label="Fechar">✕</button>
     </div>
 
-    <div class="settings-body">
+    <div class="side-body">
       <section class="settings-section">
         <h3>Aparência</h3>
         <div class="grid-form">
@@ -174,17 +204,75 @@
       </section>
 
       <section class="settings-section">
-        <h3>Segurança</h3>
-        <p class="hint" id="passkey-status">—</p>
-        <button id="btn-add-passkey" class="btn-secondary">Adicionar passkey neste dispositivo</button>
+        <h3>Passkeys</h3>
+        <p class="hint">Entra sem password usando Face ID, Touch ID ou Windows Hello.</p>
+        <ul class="passkey-list" id="passkey-list"></ul>
+        <button id="btn-add-passkey" class="btn-secondary">Adicionar passkey a esta conta</button>
+        <p class="status" id="passkey-status"></p>
+      </section>
+
+      <section class="settings-section">
+        <h3>Mudar password</h3>
+        <div class="grid-form">
+          <label class="span2">Password atual
+            <input type="password" id="oldPassword" autocomplete="current-password">
+          </label>
+          <label class="span2">Nova password
+            <input type="password" id="newPassword" autocomplete="new-password">
+          </label>
+        </div>
+        <button id="btn-change-password" class="btn-secondary">Guardar nova password</button>
+        <p class="status" id="password-status"></p>
       </section>
     </div>
   </div>
 </div>
 
+<div id="admin-panel" class="side-panel" hidden>
+  <div class="side-card">
+    <div class="side-head">
+      <h2>Administração</h2>
+      <button id="btn-close-admin" class="icon-btn" aria-label="Fechar">✕</button>
+    </div>
+
+    <div class="side-body">
+      <section class="settings-section">
+        <h3>Criar utilizador</h3>
+        <div class="grid-form">
+          <label>Utilizador
+            <input type="text" id="newUserUsername" autocomplete="off">
+          </label>
+          <label>Password temporária
+            <input type="text" id="newUserPassword" autocomplete="off">
+          </label>
+          <label>Função
+            <select id="newUserRole">
+              <option value="user">Utilizador</option>
+              <option value="admin">Admin</option>
+            </select>
+          </label>
+        </div>
+        <button id="btn-create-user" class="btn-primary">
+          <span class="btn-label">Criar utilizador</span>
+          <span class="spinner" hidden></span>
+        </button>
+        <p class="status" id="admin-create-status"></p>
+      </section>
+
+      <section class="settings-section">
+        <h3>Utilizadores</h3>
+        <div id="users-list" class="users-list"></div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container" class="toast-container" aria-live="polite"></div>
+
 <script src="vendor/exceljs.min.js"></script>
 <script src="auth.js"></script>
 <script src="push.js"></script>
+<script src="admin.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

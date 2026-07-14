@@ -1,6 +1,5 @@
 /* Notificações push (lembrete mensal de preencher a timesheet). */
 
-const WORKER_URL = 'https://mapa-kms-notify.arebelo16.workers.dev';
 const VAPID_PUBLIC_KEY = 'BPrTLzEB3F8aAz1JOliICOfwctU0V9zCuKDesKkvbOcOj-dLja0wWVmGW_CykeS58w9TOmRWbwcxJrKy7t0SbpM';
 const NOTIF_KEY = 'kmsNotifEnabled';
 
@@ -33,9 +32,8 @@ async function ativarNotificacoes() {
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
     });
   }
-  await fetch(`${WORKER_URL}/subscribe`, {
+  await authFetch('/subscribe', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ subscription: sub.toJSON() }),
   });
   localStorage.setItem(NOTIF_KEY, '1');
@@ -48,9 +46,8 @@ async function desativarNotificacoes() {
   const reg = await navigator.serviceWorker.ready;
   const sub = await reg.pushManager.getSubscription();
   if (sub) {
-    await fetch(`${WORKER_URL}/unsubscribe`, {
+    await authFetch('/unsubscribe', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ endpoint: sub.endpoint }),
     }).catch(() => {});
     await sub.unsubscribe();
@@ -58,7 +55,7 @@ async function desativarNotificacoes() {
 }
 
 async function marcarTimesheetPreenchida() {
-  await fetch(`${WORKER_URL}/mark-done`, { method: 'POST' });
+  await authFetch('/mark-done', { method: 'POST' });
 }
 
 function notificacoesAtivas() {

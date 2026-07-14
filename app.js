@@ -330,8 +330,9 @@ async function exportarExcel() {
     statusEl.textContent = `Exportado: HN -Mapa de Kms ${year} ${mesNome}.xlsx`;
   } catch (err) {
     console.error(err);
-    statusEl.style.color = '#c62828';
+    statusEl.style.color = 'var(--red)';
     statusEl.textContent = 'Erro ao exportar: ' + err.message;
+    throw err;
   }
 }
 
@@ -370,6 +371,21 @@ function initSettingsPanel() {
   });
 }
 
+// ---------- Toasts ----------
+
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast' + (type === 'error' ? ' error' : '');
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transition = 'opacity 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
+  }, 3200);
+}
+
 // ---------- Init ----------
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -377,8 +393,28 @@ window.addEventListener('DOMContentLoaded', () => {
   loadSettings();
   initTema();
   initSettingsPanel();
-  document.getElementById('btn-preview').addEventListener('click', gerarPreview);
-  document.getElementById('btn-export').addEventListener('click', exportarExcel);
+
+  document.getElementById('btn-preview').addEventListener('click', (e) => {
+    setBtnLoading(e.currentTarget, true);
+    setTimeout(() => {
+      gerarPreview();
+      setBtnLoading(e.currentTarget, false);
+    }, 150);
+  });
+
+  document.getElementById('btn-export').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    setBtnLoading(btn, true);
+    try {
+      await exportarExcel();
+      showToast('Excel exportado com sucesso.');
+    } catch (err) {
+      showToast('Erro ao exportar: ' + err.message, 'error');
+    } finally {
+      setBtnLoading(btn, false);
+    }
+  });
+
   FIXED_FIELDS.forEach(f => {
     document.getElementById(f).addEventListener('change', saveSettings);
   });
