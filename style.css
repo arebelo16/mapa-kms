@@ -87,13 +87,13 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  box-shadow: 0 4px 24px hsl(var(--shadow-color) / 0.25);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.12);
 }
 .app-header::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(115deg, rgba(255, 255, 255, 0.14), transparent 45%);
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.1), transparent 40%);
   pointer-events: none;
 }
 .app-header .header-title {
@@ -211,7 +211,6 @@ input, select {
 input:focus, select:focus {
   outline: none;
   border-color: var(--blue);
-  box-shadow: 0 0 0 3px hsl(217 90% 55% / 0.18);
 }
 
 /* ---------- Buttons ---------- */
