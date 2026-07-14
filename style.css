@@ -61,12 +61,40 @@ body {
   min-height: 100vh;
   transition: background-color 0.25s ease, color 0.25s ease;
   position: relative;
+}
+
+/* ---------- Grelha de fundo: linhas com gradiente suave + glow a seguir o rato ---------- */
+
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.bg-grid-base,
+.bg-grid-glow {
+  position: absolute;
+  inset: -28px;
+  background-size: 28px 28px;
+  background-position: -1px -1px;
+}
+.bg-grid-base {
   background-image:
     linear-gradient(var(--border) 1px, transparent 1px),
     linear-gradient(90deg, var(--border) 1px, transparent 1px);
-  background-size: 28px 28px;
-  background-attachment: fixed;
-  background-position: -1px -1px;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 18%, black 55%, rgba(0, 0, 0, 0.3) 78%, black 100%);
+  mask-image: linear-gradient(to bottom, transparent, black 18%, black 55%, rgba(0, 0, 0, 0.3) 78%, black 100%);
+}
+.bg-grid-glow {
+  background-image:
+    linear-gradient(var(--blue) 1px, transparent 1px),
+    linear-gradient(90deg, var(--blue) 1px, transparent 1px);
+  opacity: 0.85;
+  filter: drop-shadow(0 0 5px hsl(217 90% 55% / 0.65));
+  -webkit-mask-image: radial-gradient(circle 90px at var(--mx, -9999px) var(--my, -9999px), black 0%, transparent 72%);
+  mask-image: radial-gradient(circle 90px at var(--mx, -9999px) var(--my, -9999px), black 0%, transparent 72%);
+  transition: opacity 0.2s ease;
 }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

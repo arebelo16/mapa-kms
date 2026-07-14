@@ -393,6 +393,26 @@ function showToast(message, type = 'success') {
   }, 3200);
 }
 
+// ---------- Glow da grelha de fundo (segue o rato) ----------
+
+function initBgGridGlow() {
+  const root = document.documentElement;
+  let pending = false;
+  let lastX = 0;
+  let lastY = 0;
+  window.addEventListener('mousemove', (e) => {
+    lastX = e.clientX;
+    lastY = e.clientY;
+    if (pending) return;
+    pending = true;
+    requestAnimationFrame(() => {
+      root.style.setProperty('--mx', lastX + 'px');
+      root.style.setProperty('--my', lastY + 'px');
+      pending = false;
+    });
+  });
+}
+
 // ---------- Init ----------
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -400,6 +420,7 @@ window.addEventListener('DOMContentLoaded', () => {
   loadSettings();
   initTema();
   initSettingsPanel();
+  initBgGridGlow();
 
   document.getElementById('btn-preview').addEventListener('click', (e) => {
     const btn = e.currentTarget;
