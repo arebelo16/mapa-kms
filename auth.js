@@ -25,7 +25,7 @@ async function authFetch(path, options = {}) {
   const token = getToken();
   const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
   if (token) headers['Authorization'] = 'Bearer ' + token;
-  const resp = await fetch(WORKER_URL + path, { ...options, headers });
+  const resp = await fetch(WORKER_URL + path, { ...options, headers, cache: 'no-store' });
   let data = null;
   try { data = await resp.json(); } catch (e) { /* sem corpo */ }
   if (!resp.ok) {
