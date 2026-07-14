@@ -133,17 +133,7 @@ function loadSettings() {
     saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
   } catch (e) { saved = {}; }
   const merged = { ...DEFAULTS, ...saved };
-  document.getElementById('nome').value = merged.nome;
-  document.getElementById('categoria').value = merged.categoria;
-  document.getElementById('departamento').value = merged.departamento;
-  document.getElementById('matricula').value = merged.matricula;
-  document.getElementById('partida').value = merged.partida;
-  document.getElementById('destino').value = merged.destino;
-  document.getElementById('horaIda').value = merged.horaIda;
-  document.getElementById('horaVolta').value = merged.horaVolta;
-  document.getElementById('descricao').value = merged.descricao;
-  document.getElementById('valorAlvo').value = merged.valorAlvo;
-  document.getElementById('taxa').value = merged.taxa;
+  FIXED_FIELDS.forEach(f => { document.getElementById(f).value = merged[f]; });
 }
 
 function saveSettings() {
@@ -381,6 +371,7 @@ function initSettingsPanel() {
   const panel = document.getElementById('settings-panel');
   document.getElementById('btn-settings').addEventListener('click', () => {
     panel.hidden = false;
+    renderPasskeyList();
   });
   document.getElementById('btn-close-settings').addEventListener('click', () => {
     panel.hidden = true;
@@ -411,11 +402,13 @@ window.addEventListener('DOMContentLoaded', () => {
   initSettingsPanel();
 
   document.getElementById('btn-preview').addEventListener('click', (e) => {
-    setBtnLoading(e.currentTarget, true);
-    setTimeout(() => {
+    const btn = e.currentTarget;
+    setBtnLoading(btn, true);
+    // Espera um frame pintado para o spinner aparecer antes do cálculo síncrono.
+    requestAnimationFrame(() => requestAnimationFrame(() => {
       gerarPreview();
-      setBtnLoading(e.currentTarget, false);
-    }, 150);
+      setBtnLoading(btn, false);
+    }));
   });
 
   document.getElementById('btn-export').addEventListener('click', async (e) => {

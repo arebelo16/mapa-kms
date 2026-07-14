@@ -3,15 +3,6 @@
 const VAPID_PUBLIC_KEY = 'BPrTLzEB3F8aAz1JOliICOfwctU0V9zCuKDesKkvbOcOj-dLja0wWVmGW_CykeS58w9TOmRWbwcxJrKy7t0SbpM';
 const NOTIF_KEY = 'kmsNotifEnabled';
 
-function urlBase64ToUint8Array(base64String) {
-  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-  const rawData = atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
-  for (let i = 0; i < rawData.length; i++) outputArray[i] = rawData.charCodeAt(i);
-  return outputArray;
-}
-
 function pushSupported() {
   return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
 }
@@ -29,7 +20,7 @@ async function ativarNotificacoes() {
   if (!sub) {
     sub = await reg.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+      applicationServerKey: new Uint8Array(base64urlToBuf(VAPID_PUBLIC_KEY)),
     });
   }
   await authFetch('/subscribe', {

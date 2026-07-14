@@ -308,10 +308,6 @@ function initSettingsSecurity() {
       pwStatus.textContent = 'Erro: ' + e.message;
     }
   });
-
-  document.getElementById('btn-settings').addEventListener('click', () => {
-    renderPasskeyList();
-  });
 }
 
 window.addEventListener('DOMContentLoaded', () => {
