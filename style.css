@@ -46,32 +46,12 @@ body {
   min-height: 100vh;
   transition: background-color 0.25s ease, color 0.25s ease;
   position: relative;
-}
-
-/* ---------- Animated background orbs ---------- */
-
-.bg-orbs {
-  position: fixed;
-  inset: 0;
-  overflow: hidden;
-  z-index: -1;
-  pointer-events: none;
-}
-.orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(60px);
-  opacity: 0.35;
-  animation: float 22s ease-in-out infinite;
-}
-.orb-1 { width: 340px; height: 340px; background: var(--blue); top: -100px; left: -80px; animation-delay: 0s; }
-.orb-2 { width: 280px; height: 280px; background: #7c3aed; bottom: -80px; right: -60px; animation-delay: -7s; }
-.orb-3 { width: 220px; height: 220px; background: #06b6d4; top: 40%; left: 60%; animation-delay: -14s; }
-
-@keyframes float {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -40px) scale(1.08); }
-  66% { transform: translate(-25px, 25px) scale(0.94); }
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-attachment: fixed;
+  background-position: -1px -1px;
 }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

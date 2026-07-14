@@ -160,6 +160,7 @@ function mostrarApp(user) {
   document.getElementById('login-screen').hidden = true;
   document.getElementById('app-root').hidden = false;
   document.getElementById('btn-admin').hidden = user.role !== 'admin';
+  document.getElementById('header-username').textContent = user.username;
 }
 
 function mostrarLogin() {
