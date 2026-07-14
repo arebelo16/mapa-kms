@@ -13,13 +13,20 @@ async function carregarUtilizadores() {
         const row = document.createElement('div');
         row.className = 'user-row';
         const date = new Date(u.createdAt).toLocaleDateString('pt-PT');
-        row.innerHTML = `
-          <div class="user-row-info">
-            <strong>${u.username}</strong>
-            <span class="role-badge role-${u.role}">${u.role === 'admin' ? 'Admin' : 'Utilizador'}</span>
-            <small class="muted">${u.passkeyCount} passkey(s) · desde ${date}</small>
-          </div>
-        `;
+
+        const info = document.createElement('div');
+        info.className = 'user-row-info';
+        const strong = document.createElement('strong');
+        strong.textContent = u.username;
+        const badge = document.createElement('span');
+        badge.className = 'role-badge role-' + (u.role === 'admin' ? 'admin' : 'user');
+        badge.textContent = u.role === 'admin' ? 'Admin' : 'Utilizador';
+        const small = document.createElement('small');
+        small.className = 'muted';
+        small.textContent = `${u.passkeyCount} passkey(s) · desde ${date}`;
+        info.append(strong, badge, small);
+        row.appendChild(info);
+
         const actions = document.createElement('div');
         actions.className = 'user-row-actions';
 
@@ -41,7 +48,11 @@ async function carregarUtilizadores() {
         listEl.appendChild(row);
       });
   } catch (e) {
-    listEl.innerHTML = `<p class="lock-error">${e.message}</p>`;
+    listEl.innerHTML = '';
+    const p = document.createElement('p');
+    p.className = 'lock-error';
+    p.textContent = e.message;
+    listEl.appendChild(p);
   }
 }
 

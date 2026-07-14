@@ -171,6 +171,13 @@ function fmtDatePT(d) {
   return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
 }
 
+function textCell(text, className) {
+  const td = document.createElement('td');
+  if (className) td.className = className;
+  td.textContent = text;
+  return td;
+}
+
 function renderPreview() {
   const tbody = document.getElementById('preview-body');
   tbody.innerHTML = '';
@@ -184,16 +191,25 @@ function renderPreview() {
     const tr = document.createElement('tr');
     if (!row.included) tr.classList.add('excluded');
     const kmStr = row.included ? (row.kmUnits / 1000).toFixed(3) : '—';
-    tr.innerHTML = `
-      <td><input type="checkbox" data-idx="${idx}" ${row.included ? 'checked' : ''}></td>
-      <td>${DIAS_SEMANA[row.date.getDay()]}</td>
-      <td>${fmtDatePT(row.date)}</td>
-      <td>${horaIda}</td>
-      <td>${fmtDatePT(row.date)}</td>
-      <td>${horaVolta}</td>
-      <td class="km-cell">${kmStr}</td>
-      <td>${trajeto}</td>
-    `;
+
+    const tdCheck = document.createElement('td');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.dataset.idx = String(idx);
+    checkbox.checked = row.included;
+    tdCheck.appendChild(checkbox);
+
+    const cells = [
+      tdCheck,
+      textCell(DIAS_SEMANA[row.date.getDay()]),
+      textCell(fmtDatePT(row.date)),
+      textCell(horaIda),
+      textCell(fmtDatePT(row.date)),
+      textCell(horaVolta),
+      textCell(kmStr, 'km-cell'),
+      textCell(trajeto),
+    ];
+    cells.forEach((td) => tr.appendChild(td));
     tbody.appendChild(tr);
   });
 

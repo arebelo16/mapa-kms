@@ -249,7 +249,12 @@ async function renderPasskeyList() {
     passkeys.forEach((p) => {
       const li = document.createElement('li');
       const date = new Date(p.createdAt).toLocaleDateString('pt-PT');
-      li.innerHTML = `<span>${p.label || 'Passkey'} <small class="muted">— ${date}</small></span>`;
+      const span = document.createElement('span');
+      const small = document.createElement('small');
+      small.className = 'muted';
+      small.textContent = '— ' + date;
+      span.append((p.label || 'Passkey') + ' ', small);
+      li.appendChild(span);
       const btn = document.createElement('button');
       btn.className = 'icon-btn-small';
       btn.textContent = '✕';
