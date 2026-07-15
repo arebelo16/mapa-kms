@@ -263,6 +263,15 @@ function dateOnlyUTC(year, month, day) {
   return new Date(Date.UTC(year, month, day));
 }
 
+// ExcelJS cells copied from a template often share one style object across a
+// whole row/column. Writing `cell.numFmt = x` mutates that shared object in
+// place, so the *last* cell written wins and silently overwrites the format
+// of every other cell sharing it. Assigning a fresh `cell.style` object per
+// cell avoids the collision.
+function setNumFmt(cell, fmt) {
+  cell.style = { ...cell.style, numFmt: fmt };
+}
+
 async function exportarExcel() {
   const statusEl = document.getElementById('export-status');
   statusEl.textContent = 'A gerar ficheiro...';
@@ -294,9 +303,10 @@ async function exportarExcel() {
     ws.getCell('E3').value = matricula;
     ws.getCell('I2').value = `Mês: ${mesNome}`;
     ws.getCell('D49').value = taxa;
+    ws.getCell('F45').value = nome;
     const today = new Date();
     ws.getCell('G50').value = dateOnlyUTC(today.getFullYear(), today.getMonth(), today.getDate());
-    ws.getCell('G50').numFmt = 'dd/mm/yyyy';
+    setNumFmt(ws.getCell('G50'), 'mm-dd-yy');
 
     const includedRows = state.rows.filter(r => r.included);
     const FIRST_ROW = 8;
@@ -311,13 +321,13 @@ async function exportarExcel() {
       const dateOnly = dateOnlyUTC(row.date.getFullYear(), row.date.getMonth(), row.date.getDate());
       ws.getCell(`B${r}`).value = descricao;
       ws.getCell(`C${r}`).value = dateOnly;
-      ws.getCell(`C${r}`).numFmt = 'dd/mm/yyyy';
+      setNumFmt(ws.getCell(`C${r}`), 'd-mmm');
       ws.getCell(`D${r}`).value = timeToDate(horaIda);
-      ws.getCell(`D${r}`).numFmt = 'hh:mm';
+      setNumFmt(ws.getCell(`D${r}`), 'h:mm AM/PM');
       ws.getCell(`E${r}`).value = dateOnly;
-      ws.getCell(`E${r}`).numFmt = 'dd/mm/yyyy';
+      setNumFmt(ws.getCell(`E${r}`), 'd-mmm');
       ws.getCell(`F${r}`).value = timeToDate(horaVolta);
-      ws.getCell(`F${r}`).numFmt = 'hh:mm';
+      setNumFmt(ws.getCell(`F${r}`), 'h:mm AM/PM');
       ws.getCell(`H${r}`).value = row.kmUnits / 1000;
       ws.getCell(`I${r}`).value = trajeto;
     });
